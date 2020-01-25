@@ -31,17 +31,55 @@ In this article, we consider several expansions of the Brooks-Porter model.
 In this model, a social network is represented by a directed graph.
 The vertices of this graph represent accounts; the edges represent the follower relation.
 Note that in real social networks, the relation may be asymmetric (e.g., Twitter, where accounts \emph{follow} one another) or symmetric (e.g., Facebook, where accounts typically are \emph{friends}).
+Follower relationships are constant; after the follower relationships are established in the initialization of the simulation, they do not change.
 
-\subsection{Media accounts}
+subsection{Media accounts}
 
 A key feature of the Brooks-Porter model is the presence of media accounts, which are accounts that do not follow any other accounts.
 Clearly, media accounts are static ``sources'' of ideology; since they do not follow other accounts, their state variables remain constant in time.
 
 \section{Expanded models}
 
-\subsection{Nonlinear updating}
+\subsection{Dynamic follower updating}
+
+The principal novel component of our model is a probabilistic step for updating the network structure.
+This allows accounts to stop following other accounts (media and non-media) or to begin following other accounts.
+In principle, this will allow us to observe echo chamber formation through the lens of follower relationships as well as ideological dimension.
+
+\subsubsection{Unfollowing}
+
+In our model, when a media account's content is rejected by a follower account for its ideology, there is a nonzero probability that that follower will furthermore unfollow the media account.
+A similar unfollowing rule is in place for non-media accounts, but with a different weighting.
+This is to incorporate the assumption that personal relationships are more resilient to differences in ideology than an individual's relationship with a media organization.\footnote{A weakness of this concept is that it treats all non-media follower relationships as ``personal relationships'', although on some networks (e.g., Twitter), many accounts follow highly influential non-media individuals with whom they have no personal connection (e.g., celebrities). The models we consider do not distinguish such high-influence but non-media individuals from other accounts.}
+
+The follower updating rule is as follows. At each time step, if an account $i$ rejects the content of a media account $m$, the edge is deleted with probability
+\[
+p_u = \max\{1, s_M(\|x_i - x_m\| - c)}
+\]
+where $c$ is the receptiveness parameter, and $s_M$ is the \emph{media sensitivity}, a parameter controlling how easily individuals are driven to unfollow media accounts.
+
+The rule for unfollowing individual accounts is the same, except with a different (generally much smaller) sensitivity parameter $s_I$ replacing $s_M$.
+
+\subsubsection{Following}
+
+We also include a mechanism for non-media accounts to begin following media accounts if presented with content sufficiently similar to their own ideology.
+Since a non-follower cannot observe a media account directly, this is modeled as a second-order effect; that is, an account may begin following a media account if:
+\begin{enumerate}
+    \item another account it follows also follows the media account
+    \item the media account shares content sufficiently close to its own ideology
+\end{itemize}
+
+Suppose that a non-media account $i$ follows another non-media account $j$, which in turn follows the media account $m$.
+
+
+\subsection{Adding noise to ideology}
+
+Most larger media outlets do not have a unique ideological voice; different authors or editors may choose to write or share content varying across a range of ideologies.
+
 
 \subsection{Smooth cutoff functions}
+
+In this section we address a generalization of the receptiveness function that does not use a step function cutoff to determine receptiveness.\footnote{Certainly, this author would prefer to believe that people may be occasionally receptive to sufficiently high-quality arguments, even if they do not match the listener's existing ideology.}
 
 \subsection{Media networks}
 
