@@ -1,11 +1,19 @@
 ## Dynamics for the graphical ideology model
 
-function getnewid(g, v, c, selfweight = 1)
+function getnewid_noq(g, v, c, selfweight = 1)
     selfid = props(g, v)[:ideology]
     neighborid = [props(g, w)[:ideology] for w in neighbors(g, v)]
     map!(x -> (abs(x - selfid) < c) * x, neighborid, neighborid)
     (sum(neighborid) + selfweight * selfid) / (length(neighborid) + 1)
 end
+
+function minq(selfid, otherid, c)
+
+end
+
+function getnewid_q(g, v, c, selfweight = 1)
+    selfid = props(g, v)[:ideology]
+
 
 function updateg!(g, c)
     newids = [getnewid(g,v,c) for v in vertices(g)]
