@@ -1,4 +1,4 @@
-using LightGraphs, MetaGraphs, SNAPDatasets
+using LightGraphs, MetaGraphs, SNAPDatasets, Random
 
 ### Data structure for storing ideology and quality at once. Not sure if I'll actually use this
 struct QIVector

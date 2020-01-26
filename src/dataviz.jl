@@ -17,6 +17,11 @@ end
 
 function colornet!(g)
     for v in vertices(g)
-        set_prop!(g, v, :color, getcolor(props(g, v, :ideology)))
+        set_prop!(g, v, :color, getcolor(props(g, v)[:ideology]))
     end
+end
+
+function drawcolorgraph(g, fname)
+    nodefillc = [parse(Colorant, props(g, v)[:color]) for v in vertices(g)]
+    gplot(g, nodefillc = nodefillc) |> SVG(fname, 10cm, 10cm)
 end
