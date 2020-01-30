@@ -7,11 +7,6 @@ struct QIVector
     quality::Float64
 end
 
-function ERIdeoNetwork(n, p)
-    g = erdos_renyi(n, p)
-    mg = MetaGraph(g)
-end
-
 ## Simple versions; assign ideology and quality at random as in the simple example in the Brooks-Porter paper
 
 function assignid!(g)
