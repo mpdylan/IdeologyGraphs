@@ -7,10 +7,6 @@ function getnewid_noq(g, v, c, selfweight = 1)
     (sum(neighborid) + selfweight * selfid) / (length(neighborid) + 1)
 end
 
-function minq(selfid, otherid, c, dist)
-
-end
-
 function getnewid_q(g, v, c, selfweight = 1)
     selfid = props(g, v)[:ideology]
     neighborid = [props(g, w)[:ideology] for w in neighbors(g, v)]

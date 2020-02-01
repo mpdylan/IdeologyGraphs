@@ -1,31 +1,57 @@
+###################################
+# models.jl
+# A collection of generative models for ideology graphs.
+# Includes Erdos-Renyi type graphs, ring graphs, 
+# and several graphs from the SNAP graph datasets.
+###################################
+
 using LightGraphs, MetaGraphs, SNAPDatasets, Random
 
-### Data structure for storing ideology and quality at once. Not sure if I'll actually use this
-struct QIVector
-    dim::Integer
-    ideology::Array{Float64, 1}
-    quality::Float64
+### Core types and utility functions
+
+abstract type IdeologyGraph <: AbstractGraph end
+
+struct IGraph <: IdeologyGraph
+    g::MetaGraph{Int64, Float64}
+    dynamic::Bool
 end
 
-## Simple versions; assign ideology and quality at random as in the simple example in the Brooks-Porter paper
+struct IQGraph <: IdeologyGraph
+    g::MetaGraph{Int64, Float64}
+    dynamic::Bool
+end
 
-function assignid!(g)
+function assignid!(graph::IdeologyGraph)
     ids = shuffle(collect(range(-1, 1, step=2/nv(g))))
-    for v in vertices(g)
-        set_prop!(g, v, :ideology, ids[v])
+    for v in vertices(graph.g)
+        set_prop!(graph.g, v, :ideology, ids[v])
     end
 end
 
-function assignq!(g)
-    for v in vertices(g)
-        set_prop!(g, v, :quality, rand())
+function assignid!(graph::IdeologyGraph, iv::Array{Float64}, randomize = true)
+    randomize && shuffle!(iv)
+    for v in vertices(graph.g)
+        set_prop!(graph.g, v, :ideology, iv[v])
     end
 end
 
-function SNAPIdeog(name::Symbol)
-    g = MetaGraph(loadsnap(name))
-    assignid!(g)
-    assignq!(g)
-    g
+function assignq!(graph::IQGraph)
+    for v in vertices(graph.g)
+        set_prop!(graph.g, v, :quality, rand())
+    end
 end
+
+function assignq!(graph::IQGraph, qv::Array{Float64}, randomize = true)
+    randomize && shuffle!(qv)
+    for v in vertices(graph.g)
+        set_prop!(graph.g, v, :quality, qv[v])
+    end
+end
+
+function SNAPIdeog(name::Symbol, type::DataType, dynamic::Bool)
+    mg = MetaGraph(loadsnap(name))
+    graph = type(mg, dynamic)
+end
+
+### Graph generation models
 
