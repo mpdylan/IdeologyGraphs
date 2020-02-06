@@ -31,7 +31,7 @@ const DEFAULT_DIST = Dict(
                      )
 
 function assignid!(graph::IdeologyGraph)
-    ids = shuffle(collect(range(-1, 1, step=2/nv(g))))
+    ids = shuffle(collect(range(-1, 1, step=2/nv(graph.g))))
     for v in vertices(graph.g)
         set_prop!(graph.g, v, :ideology, ids[v])
     end
@@ -64,15 +64,15 @@ end
 
 ### Graph generation models
 
-function ermodel(n, p, type::DataType, is_directed = false, id_dim = 1, dynamic = false, distance = nothing)
-    g = MetaGraph(erdos_renyi(n, p, is_directed))
+function ermodel(n, p, type, is_directed = false, id_dim = 1, dynamic = false, distance = nothing)
+    g = MetaGraph(erdos_renyi(n, p, is_directed = is_directed))
     if distance == nothing
         distance = DEFAULT_DIST[id_dim]
     end
     return type(g, id_dim, dynamic, distance)
 end
 
-function wsmodel(n, k, beta, type::DataType, id_dim = 1, dynamic = false, distance = nothing)
+function wsmodel(n, k, beta, type, id_dim = 1, dynamic = false, distance = nothing)
     g = MetaGraph(watts_strogatz(n, k, beta))
     if distance == nothing
         distance = DEFAULT_DIST[id_dim]

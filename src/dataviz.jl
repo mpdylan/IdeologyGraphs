@@ -15,13 +15,13 @@ function getcolor(x)
     colorlist[end]
 end
 
-function colornet!(g)
-    for v in vertices(g)
-        set_prop!(g, v, :color, getcolor(props(g, v)[:ideology]))
+function colornet!(g::IdeologyGraph)
+    for v in vertices(g.g)
+        set_prop!(g.g, v, :color, getcolor(props(g.g, v)[:ideology]))
     end
 end
 
-function drawcolorgraph(g, fname)
-    nodefillc = [parse(Colorant, props(g, v)[:color]) for v in vertices(g)]
-    gplot(g, nodefillc = nodefillc) |> SVG(fname, 10cm, 10cm)
+function drawcolorgraph(g::IdeologyGraph)
+    nodefillc = [parse(Colorant, props(g.g, v)[:color]) for v in vertices(g.g)]
+    gplot(g.g, nodefillc = nodefillc)
 end
