@@ -269,3 +269,6 @@ TSWLatexianTemp*
 
 # generated if using elsarticle.cls
 *.spl
+
+# Don't upload output data or plots, for the sake of space
+output/*
