@@ -1,6 +1,6 @@
 # Data visualization for the ideology graph model.
 
-using LightGraphs, MetaGraphs, GraphPlot, Compose, Colors
+using LightGraphs, MetaGraphs, GraphPlot, Compose, Colors, Plots
 
 const colorlist = ["blue1", "steelblue3", "lightskyblue2", "lightsteelblue1", "gray85",
                    "lightsalmon", "coral2", "firebrick2", "red2"]

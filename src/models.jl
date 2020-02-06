@@ -7,19 +7,28 @@
 
 using LightGraphs, MetaGraphs, SNAPDatasets, Random
 
-### Core types and utility functions
+### Core types, constants, and utility functions
 
-abstract type IdeologyGraph <: AbstractGraph end
+abstract type IdeologyGraph{T} <: AbstractGraph{T} end
 
-struct IGraph <: IdeologyGraph
-    g::MetaGraph{Int64, Float64}
+struct IGraph{T} <: IdeologyGraph{T}
+    g::MetaGraph{T, Float64}
+    id_dim::Int64
     dynamic::Bool
+    distance::Function
 end
 
-struct IQGraph <: IdeologyGraph
-    g::MetaGraph{Int64, Float64}
+struct IQGraph{T} <: IdeologyGraph{T}
+    g::MetaGraph{T, Float64}
+    id_dim::Int64
     dynamic::Bool
+    distance::Function 
 end
+
+const DEFAULT_DIST = Dict(
+                     1 => (x, y) -> abs(x - y),
+                     2 => (x, y) -> sqrt((x[1] - y[1])^2 + (x[2] - y[2])^2)
+                     )
 
 function assignid!(graph::IdeologyGraph)
     ids = shuffle(collect(range(-1, 1, step=2/nv(g))))
@@ -48,10 +57,26 @@ function assignq!(graph::IQGraph, qv::Array{Float64}, randomize = true)
     end
 end
 
-function SNAPIdeog(name::Symbol, type::DataType, dynamic::Bool)
+function SNAPIdeog(name::Symbol, type::DataType, id_dim = 1, dynamic = false)
     mg = MetaGraph(loadsnap(name))
     graph = type(mg, dynamic)
 end
 
 ### Graph generation models
+
+function ermodel(n, p, type::DataType, is_directed = false, id_dim = 1, dynamic = false, distance = nothing)
+    g = MetaGraph(erdos_renyi(n, p, is_directed))
+    if distance == nothing
+        distance = DEFAULT_DIST[id_dim]
+    end
+    return type(g, id_dim, dynamic, distance)
+end
+
+function wsmodel(n, k, beta, type::DataType, id_dim = 1, dynamic = false, distance = nothing)
+    g = MetaGraph(watts_strogatz(n, k, beta))
+    if distance == nothing
+        distance = DEFAULT_DIST[id_dim]
+    end
+    return IQGraph(g, id_dim, dynamic, distance)
+end
 
