@@ -35,3 +35,4 @@ function drawcolorgraph(g::IdeologyGraph)
     nodefillc = [parse(Colorant, props(g.g, v)[:color]) for v in vertices(g.g)]
     gplot(g.g, nodefillc = nodefillc, nodelabel = nodelabel)
 end
+

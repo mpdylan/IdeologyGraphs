@@ -52,7 +52,7 @@ function updateg!(g::IQGraph, c)
     (newids, newqs, m)
 end
 
-function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 250000, verbose = false)
+function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 1000, verbose = false)
     m = 1
     ids = [props(g.g, v)[:ideology] for v in vertices(g.g)]
     steps = 0
@@ -60,22 +60,19 @@ function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 250000, verbose = fals
         (newids, m) = updateg!(g, c)
         ids = hcat(ids, newids)
         steps += 1
-        if steps % 10000 == 0 print(steps) end
     end
     return ids, steps
 end
 
-function fullsim_draw(g::IGraph, c, tol = 10^(-4), maxsteps = 250000, verbose = false)
+function fullsim_gif(g::IGraph, c, len = 400, tol = 10^(-4), verbose = false)
     m = 1
     ids = [props(g.g, v)[:ideology] for v in vertices(g.g)]
     steps = 0
-    while m > tol && steps < maxsteps
+    @gif for i = 1:len
         (newids, m) = updateg!(g, c)
         ids = hcat(ids, newids)
         steps += 1
-        if steps % 10000 == 0 print(steps) end
         colornet!(g)
-        show(drawcolorgraph(g))
+        drawcolorgraph(g)
     end
-    return ids, steps
 end

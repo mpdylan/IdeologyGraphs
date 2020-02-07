@@ -93,7 +93,7 @@ function wsmodel(n, k, beta, type, id_dim = 1, dynamic = false, distance = nothi
     if distance == nothing
         distance = DEFAULT_DIST[id_dim]
     end
-    return IQGraph(g, id_dim, dynamic, distance)
+    return type(g, id_dim, dynamic, distance)
 end
 
 ### Adding media accounts
