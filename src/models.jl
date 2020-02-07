@@ -11,6 +11,8 @@ using LightGraphs, MetaGraphs, SNAPDatasets, Random
 
 abstract type IdeologyGraph{T} <: AbstractGraph{T} end
 
+abstract type DirectedIdeologyGraph{T} <: AbstractGraph{T} end
+
 struct IGraph{T} <: IdeologyGraph{T}
     g::MetaGraph{T, Float64}
     id_dim::Int64
@@ -20,6 +22,20 @@ end
 
 struct IQGraph{T} <: IdeologyGraph{T}
     g::MetaGraph{T, Float64}
+    id_dim::Int64
+    dynamic::Bool
+    distance::Function 
+end
+
+struct IDiGraph{T} <: DirectedIdeologyGraph{T}
+    g::MetaDiGraph{T, Float64}
+    id_dim::Int64
+    dynamic::Bool
+    distance::Function
+end
+
+struct IQDiGraph{T} <: DirectedIdeologyGraph{T}
+    g::MetaDiGraph{T, Float64}
     id_dim::Int64
     dynamic::Bool
     distance::Function 
@@ -80,3 +96,51 @@ function wsmodel(n, k, beta, type, id_dim = 1, dynamic = false, distance = nothi
     return IQGraph(g, id_dim, dynamic, distance)
 end
 
+### Adding media accounts
+
+# One approach: connect the media account to a given number of accounts, selected uniformly at random
+
+# Utility function: select a random subset of the vertices
+
+function random_verts(g, n)
+    verts = Array{Int64, 1}()
+    maxvert = nv(g)
+    while length(verts) < n
+        choice = convert(Int64, ceil(maxvert*rand()))
+        if !(choice in verts)
+            append!(verts, choice)
+        end
+    end
+    verts
+end
+
+function addmedia_rand!(graph::IdeologyGraph, n_accounts, n_followers, ideology, quality = nothing)
+    n = nv(graph.g)
+    verts = random_verts(graph.g, n_followers)
+    for i=1:n_accounts-1 verts = hcat(verts, random_verts(graph.g, n_followers)) end
+    add_vertices!(graph.g, n_accounts)
+    for i=n+1:n+n_accounts
+        set_prop!(graph.g, i, :ideology, ideology)
+        if quality != nothing set_prop!(graph.g, i, :quality, quality) end
+        set_prop!(graph.g, i, :media, true)
+        for vert in verts[:,i-n] add_edge!(graph.g, vert, i) end
+    end
+    true
+end
+
+# Another approach: connect the media account to a given number of accounts,
+# selected to be the ideologically nearest
+
+function addmedia_nearest!(graph::IdeologyGraph, n_accounts, n_followers, ideology, quality = nothing)
+    n = nv(graph.g)
+    add_vertices!(graph.g, n_accounts)
+    for i=n+1:n+n_accounts
+        followers = sort(collect(1:n), by = 
+                         v -> graph.distance(props(graph.g, v)[:ideology], ideology[i-n]))[1:n_followers]
+        set_prop!(graph.g, i, :ideology, ideology[i-n])
+        if quality != nothing set_prop!(graph.g, i, :quality, quality[i-n]) end
+        set_prop!(graph.g, i, :media, true)
+        for vert in followers add_edge!(graph.g, vert, i) end
+    end
+    true
+end    

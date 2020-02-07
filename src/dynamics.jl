@@ -1,10 +1,11 @@
 ## Dynamics for the graphical ideology model
 
+
 function id_update(g::IGraph, v, c, selfweight = 1)
     selfid = props(g.g, v)[:ideology]
     neighborid = [props(g.g, w)[:ideology] for w in neighbors(g.g, v) 
                         if g.distance(props(g.g, w)[:ideology], selfid) <= c]
-    (sum(neighborid) + selfweight * selfid) / (length(neighborid) + 1)
+    length(neighborid) > 0 ? ((sum(neighborid) + selfweight * selfid) / (length(neighborid) + 1)) : selfid
 end
 
 function id_update(g::IQGraph, v, c, selfweight = 1)
@@ -27,30 +28,54 @@ function getminq(g::IQGraph, v, w, c)
 end
 
 function updateg!(g::IGraph, c)
-    newids = [id_update(g.g,v,c) for v in vertices(g.g)]
+    newids = Array{Float64, 1}()
+    for v in vertices(g.g) append!(newids, id_update(g, v, c)) end
+    # newids = [id_update(g,v,c) for v in vertices(g.g)]
     m = maximum([abs(newids[v] - props(g.g, v)[:ideology]) for v in vertices(g.g)])
     for v in vertices(g.g)
-        set_prop!(g.g, v, :ideology, newids[v])
+        if !has_prop(g.g, v, :media)
+            set_prop!(g.g, v, :ideology, newids[v])
+        end
     end
     (newids, m)
 end
 
 function updateg!(g::IQGraph, c)
-    newids = [id_update(g.g, v, c) for v in vertices(g.g)]
-    newqs = [q_update(g.g, v, c) for v in vertices(g.g)]
+    newids = [id_update(g, v, c) for v in vertices(g.g)]
+    newqs = [q_update(g, v, c) for v in vertices(g.g)]
     m = maximum([abs(newids[v] - props(g.g, v)[:ideology]) for v in vertices(g.g)])
     for v in vertices(g.g)
-        set_prop!(g.g, v, :ideology, newids[v])
+        if !has_prop(g.g, v, :media)
+            set_prop!(g.g, v, :ideology, newids[v])
+        end
     end
     (newids, newqs, m)
 end
 
-function fullsim(g::IGraph, c, tol = 10^(-4), verbose = false)
+function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 250000, verbose = false)
     m = 1
     ids = [props(g.g, v)[:ideology] for v in vertices(g.g)]
-    while m > tol
+    steps = 0
+    while m > tol && steps < maxsteps
         (newids, m) = updateg!(g, c)
         ids = hcat(ids, newids)
+        steps += 1
+        if steps % 10000 == 0 print(steps) end
     end
-    ids
+    return ids, steps
+end
+
+function fullsim_draw(g::IGraph, c, tol = 10^(-4), maxsteps = 250000, verbose = false)
+    m = 1
+    ids = [props(g.g, v)[:ideology] for v in vertices(g.g)]
+    steps = 0
+    while m > tol && steps < maxsteps
+        (newids, m) = updateg!(g, c)
+        ids = hcat(ids, newids)
+        steps += 1
+        if steps % 10000 == 0 print(steps) end
+        colornet!(g)
+        show(drawcolorgraph(g))
+    end
+    return ids, steps
 end
