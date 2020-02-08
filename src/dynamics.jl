@@ -60,6 +60,7 @@ function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 1000, verbose = false)
         (newids, m) = updateg!(g, c)
         ids = hcat(ids, newids)
         steps += 1
+        print(join(steps, '\n'))
     end
     return ids, steps
 end

@@ -73,9 +73,12 @@ function assignq!(graph::IQGraph, qv::Array{Float64}, randomize = true)
     end
 end
 
-function SNAPIdeog(name::Symbol, type::DataType, id_dim = 1, dynamic = false)
+function SNAPIdeog(name::Symbol, type, id_dim = 1, dynamic = false, distance = nothing)
     mg = MetaGraph(loadsnap(name))
-    graph = type(mg, dynamic)
+    if distance == nothing
+        distance = DEFAULT_DIST[id_dim]
+    end
+    graph = type(mg, id_dim, dynamic, distance)
 end
 
 ### Graph generation models
