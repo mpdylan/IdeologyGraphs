@@ -119,3 +119,4 @@ function fullsim_gif(g::IGraph, c, len = 400, tol = 10^(-4))
 end
 
 # Graphs with time-dependent network structure
+
