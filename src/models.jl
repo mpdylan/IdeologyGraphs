@@ -6,6 +6,7 @@
 ###################################
 
 using LightGraphs, MetaGraphs, SNAPDatasets, Random
+import Base.copy
 
 ### Core types, constants, and utility functions
 
@@ -40,6 +41,21 @@ struct IQDiGraph{T} <: DirectedIdeologyGraph{T}
     dynamic::Bool
     distance::Function 
 end
+
+function copy(graph::IdeologyGraph)
+    newg = copy(graph.g)
+    newid_dim = graph.id_dim
+    newdynamic = graph.dynamic
+    newdist = graph.distance
+end
+
+function copy(graph::DirectedIdeologyGraph)
+    newg = copy(graph.g)
+    newid_dim = graph.id_dim
+    newdynamic = graph.dynamic
+    newdist = graph.distance
+end
+
 
 const DEFAULT_DIST = Dict(
                      1 => (x, y) -> abs(x - y),

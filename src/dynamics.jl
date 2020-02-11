@@ -54,7 +54,46 @@ function updateg!(g::IQGraph, c)
     (newids, newqs, m)
 end
 
-function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 1000, verbose = false)
+function fullsim(g::IGraph, c, tol = 10^(-4), maxsteps = 1000)
+    h = copy(g)
+    m = 1
+    ids = [props(h.g, v)[:ideology] for v in vertices(h.g)]
+    steps = 0
+    while m > tol && steps < maxsteps
+        (newids, m) = updateg!(h, c)
+        ids = hcat(ids, newids)
+        steps += 1
+    end
+    return h, ids
+end
+
+function R_0(g::IGraph, M, c, tol = 10^(-4), maxsteps = 1000)
+    h = copy(g)
+    N = nv(h.g)
+    for i=1:N
+        if has_prop(h, i, :media)
+            rem_vertices!(h, i)
+        end
+    end
+    ids = fullsim!(h, c, tol, maxsteps)
+    R = 0.0
+    for i=1:N
+        R += h.distance(props(h, i)[:ideology], M) / N
+    end
+    R
+end
+
+function R_M(g::IGraph, M, c, tol = 10^(-4), maxsteps = 1000)
+    h, ids = fullsim(g, c, tol, maxsteps)
+    N = nv(g.g)
+    R = 0.0
+    for i=1:N
+        R += g.distance(props(g, i)[:ideology], M) / N
+    end
+    R
+end
+
+function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 1000)
     m = 1
     ids = [props(g.g, v)[:ideology] for v in vertices(g.g)]
     steps = 0
@@ -62,12 +101,11 @@ function fullsim!(g::IGraph, c, tol = 10^(-4), maxsteps = 1000, verbose = false)
         (newids, m) = updateg!(g, c)
         ids = hcat(ids, newids)
         steps += 1
-        print(join(steps, '\n'))
     end
-    return ids, steps
+    return ids
 end
 
-function fullsim_gif(g::IGraph, c, len = 400, tol = 10^(-4), verbose = false)
+function fullsim_gif(g::IGraph, c, len = 400, tol = 10^(-4))
     m = 1
     ids = [props(g.g, v)[:ideology] for v in vertices(g.g)]
     steps = 0
