@@ -75,6 +75,7 @@ function R_0(g::IGraph, M, c, tol = 10^(-4), maxsteps = 1000)
             rem_vertices!(h, i)
         end
     end
+    N = nv(h.g)
     ids = fullsim!(h, c, tol, maxsteps)
     R = 0.0
     for i=1:N
@@ -89,6 +90,24 @@ function R_M(g::IGraph, M, c, tol = 10^(-4), maxsteps = 1000)
     R = 0.0
     for i=1:N
         R += g.distance(props(g, i)[:ideology], M) / N
+    end
+    R
+end
+
+function R_multipole(g::IGraph, c, tol = 10^(-4), maxsteps = 1000)
+    f = copy(g)
+    h = copy(g)
+    N = nv(h.g)
+    for i=1:N
+        if has_prop(h, i, :media)
+            rem_vertices!(h, i)
+        end
+    end
+    N = nv(h.g)
+    fullsim!(f)
+    fullsim!(g)
+    for i=1:N
+        R += g.distance(props(g, i)[:ideology], props(h, i)[:ideology]) / N
     end
     R
 end
