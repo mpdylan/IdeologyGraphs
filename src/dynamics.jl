@@ -1,6 +1,8 @@
 ## Dynamics for the graphical ideology model
 
 
+# Functions for updating probability
+
 function id_update(g::IGraph, v, c, selfweight = 1)
     selfid = props(g.g, v)[:ideology]
     neighborid = [props(g.g, w)[:ideology] for w in neighbors(g.g, v) 
@@ -77,3 +79,5 @@ function fullsim_gif(g::IGraph, c, len = 400, tol = 10^(-4), verbose = false)
         drawcolorgraph(g)
     end
 end
+
+# Graphs with time-dependent network structure

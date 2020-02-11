@@ -36,3 +36,5 @@ function drawcolorgraph(g::IdeologyGraph)
     gplot(g.g, nodefillc = nodefillc, nodelabel = nodelabel)
 end
 
+# Plotting ideology vs quality
+
