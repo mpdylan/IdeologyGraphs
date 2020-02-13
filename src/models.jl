@@ -43,17 +43,21 @@ struct IQDiGraph{T} <: DirectedIdeologyGraph{T}
 end
 
 function copy(graph::IdeologyGraph)
+    T = typeof(graph)
     newg = copy(graph.g)
     newid_dim = graph.id_dim
     newdynamic = graph.dynamic
     newdist = graph.distance
+    return T(newg, newid_dim, newdynamic, newdist)
 end
 
 function copy(graph::DirectedIdeologyGraph)
+    T = typeof(graph)
     newg = copy(graph.g)
     newid_dim = graph.id_dim
     newdynamic = graph.dynamic
     newdist = graph.distance
+    return T(newg, newid_dim, newdynamic, newdist)
 end
 
 
