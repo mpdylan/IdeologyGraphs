@@ -272,3 +272,7 @@ TSWLatexianTemp*
 
 # Don't upload output data or plots, for the sake of space
 output/*
+
+# Sketchpad doesn't need to be synced
+notebooks/sketchpad.ipynb
+notebooks/.ipynb_checkpoints/sketchpad-checkpoint.ipynb

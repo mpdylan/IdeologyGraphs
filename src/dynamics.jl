@@ -10,7 +10,7 @@ function id_update(g::IGraph, v, c, selfweight = 1)
     for w in neighbors(g.g, v)
         if g.distance(props(g.g, w)[:ideology], selfid) <= c
             newid += props(g.g, w)[:ideology]
-            n += 0
+            n += 1
         end
     end
     newid / (n + selfweight)
@@ -38,7 +38,7 @@ function getminq(g::IQGraph, v, w, c)
     d / c
 end
 
-function updateg2!(g::IGraph, c)
+function updateg!(g::IGraph, c)
     newids = Array{Float64, 1}()
 
     # for v in vertices(g.g) append!(newids, id_update(g, v, c)) end
