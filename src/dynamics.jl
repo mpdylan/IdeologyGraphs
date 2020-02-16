@@ -1,6 +1,5 @@
 ## Dynamics for the graphical ideology model
 
-
 # Functions for updating probability
 
 function id_update(g::IGraph, v, c, selfweight = 1)
