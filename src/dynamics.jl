@@ -165,5 +165,29 @@ function fullsim_gif(g::IGraph, c, len = 400, tol = 10^(-4))
     end
 end
 
+function R_er(N, M, mean_degree, n_media, n_followers, n_trials)
+    g = ermodel(N, 25 / N, IGraph)
+    R = zeros(n_trials)
+    for i=1:n_trials
+        assignid!(g)
+        fullsim!(g, 0.5)
+        for j = 1:nv(g.g)
+            R[i] += g.distance(props(g.g, j)[:ideology], M) / nv(g.g)
+        end
+    end
+    mean_R₀ = sum(R) / n_trials
+    addmedia_rand!(g, n_media, n_followers, M)
+    R = zeros(n_trials)
+    for i=1:n_trials
+        assignid!(g)
+        fullsim!(g, 0.5)
+        for j = 1:nv(g.g)
+        R[i] += g.distance(props(g.g, j)[:ideology], M) / nv(g.g)
+        end
+    end
+    mean_R = sum(R) / n_trials
+    mean_R₀ / mean_R
+end
+
 # Graphs with time-dependent network structure
 
